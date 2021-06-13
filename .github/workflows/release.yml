@@ -101,9 +101,9 @@ jobs:
       - name: List files
         run: ls ./nupkg
 
-      - name: Push to GitHub Feed
-        run: echo "Deploy to GitHub" #dotnet nuget push ./nupkg/*.nupkg --api-key $GITHUB_TOKEN --skip-duplicate --source $GITHUB_FEED
+      # - name: Push to GitHub Feed
+      #   run: echo "Deploy to GitHub" #dotnet nuget push ./nupkg/*.nupkg --api-key $GITHUB_TOKEN --skip-duplicate --source $GITHUB_FEED
         
       - name: Push to NuGet Feed
-        run: echo "deploy to NuGet" #dotnet nuget push ./nupkg/*.nupkg --api-key $NUGET_KEY --skip-duplicate --source $NUGET_FEED
+        run: dotnet nuget push ./nupkg/*.nupkg --api-key $NUGET_KEY --skip-duplicate --source $NUGET_FEED
 
