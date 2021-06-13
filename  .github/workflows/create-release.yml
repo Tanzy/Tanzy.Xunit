@@ -1,0 +1,63 @@
+name: Create Release
+on:
+  workflow_dispatch:
+  
+env:
+  # Stop wasting time caching packages
+  DOTNET_SKIP_FIRST_TIME_EXPERIENCE: true
+  # Disable sending usage data to Microsoft
+  DOTNET_CLI_TELEMETRY_OPTOUT: true
+  # Project name to pack and publish
+  PROJECT_NAME: Tanzy.Xunit
+  # GitHub Packages Feed settings
+  GITHUB_FEED: https://nuget.pkg.github.com/Tanzy/index.json
+  GITHUB_USER: Tanzy
+  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  # Official NuGet Feed settings
+  NUGET_FEED: https://api.nuget.org/v3/index.json
+  NUGET_KEY: ${{ secrets.NUGET_KEY }}
+  
+
+
+jobs:
+  
+  draftRelease:
+    name: "Draft Release"
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0 # fetch-depth is needed for GitVersion
+      
+      #Install and calculate the new version with GitVersion
+      - name: Install GitVersion
+        uses: gittools/actions/gitversion/setup@v0.9.7
+        with:
+          versionSpec: '5.x'
+
+      - name: Determine Version
+        uses: gittools/actions/gitversion/execute@v0.9.7
+        id: gitversion # step id used as reference for output values
+
+      - name: Display GitVersion outputs
+        run: |
+          echo "MajorMinorPatch ${{ steps.gitversion.outputs.majorMinorPatch }}"
+          echo "NuGetVersionV2: ${{ steps.gitversion.outputs.nuGetVersionV2 }}"
+          echo "CommitsSinceVersionSource: ${{ steps.gitversion.outputs.CommitsSinceVersionSource }}"
+          
+      # Drafts your next Release notes as Pull Requests are merged into "master"
+      # https://github.com/marketplace/actions/release-drafter
+      - name: Draft Release
+        uses: release-drafter/release-drafter@v5.15.0
+        with:
+          # (Optional) specify config name to use, relative to .github/. Default: release-drafter.yml
+          config-name: release-drafter.yml
+          #filter-by-commitish: false # Filter previous releases to consider only the target branch of the release. Default: false.
+          disable-autolabeler: true
+          commitish: main
+          version: v${{ steps.gitversion.outputs.majorMinorPatch }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          
+      

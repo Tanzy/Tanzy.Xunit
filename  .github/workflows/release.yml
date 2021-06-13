@@ -1,0 +1,109 @@
+# Release to NuGet
+name: Released
+on:
+  release:
+    # Only use the types keyword to narrow down the activity types that will trigger your workflow.
+    types: [published] #, created, edited]
+
+env:
+  # Stop wasting time caching packages
+  DOTNET_SKIP_FIRST_TIME_EXPERIENCE: true
+  # Disable sending usage data to Microsoft
+  DOTNET_CLI_TELEMETRY_OPTOUT: true
+  # Project name to pack and publish
+  PROJECT_NAME: Tanzy.Xunit
+  # GitHub Packages Feed settings
+  GITHUB_FEED: https://nuget.pkg.github.com/Tanzy/index.json
+  GITHUB_USER: Tanzy
+  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  # Official NuGet Feed settings
+  NUGET_FEED: https://api.nuget.org/v3/index.json
+  NUGET_KEY: ${{ secrets.NUGET_KEY }}
+  
+
+
+jobs:
+
+  build:
+    name: Build and Test Project
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      matrix:
+        os: [ ubuntu-latest ] #, windows-latest, macos-latest ]
+    steps:
+      - name: Dump GitHub context
+        env:
+          GITHUB_CONTEXT: ${{ toJson(github) }}
+        run: echo "$GITHUB_CONTEXT"
+        
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0 # fetch-depth is needed for GitVersion
+          # The branch, tag or SHA to checkout. When checking out the repository that
+          # triggered a workflow, this defaults to the reference or SHA for that event.
+          # Otherwise, uses the default branch.
+          ref: '${{ github.event.release.tag_name }}'
+      #Install and calculate the new version with GitVersion
+      - name: Install GitVersion
+        uses: gittools/actions/gitversion/setup@v0.9.7
+        with:
+          versionSpec: '5.x'
+
+      - name: Determine Version
+        uses: gittools/actions/gitversion/execute@v0.9.7
+        id: gitversion # step id used as reference for output values
+
+      - name: Display GitVersion outputs
+        run: |
+          echo "MajorMinorPatch ${{ steps.gitversion.outputs.majorMinorPatch }}"
+          echo "NuGetVersionV2: ${{ steps.gitversion.outputs.nuGetVersionV2 }}"
+          echo "CommitsSinceVersionSource: ${{ steps.gitversion.outputs.CommitsSinceVersionSource }}"
+
+      - name: Display github context outputs
+        run: echo "tag_name ${{ github.event.release.tag_name }}"
+
+      - name: Setup .NET Core
+        uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: '3.x'
+          
+      - name: Restore
+        run: dotnet restore
+        
+      - name: Build
+        run: dotnet build -c Release --no-restore -p:Version=${{ steps.gitversion.outputs.semVer }}
+        
+      - name: Test
+        run: dotnet test --no-restore -c Release
+        
+      - name: Pack
+        run: dotnet pack -v normal -c Release --no-restore -p:PackageVersion=${{ steps.gitversion.outputs.nuGetVersionV2 }} src/$PROJECT_NAME/$PROJECT_NAME.*proj
+      # Upload NuGet Package to Artifact store 
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: nupkg
+          path: ./src/${{ env.PROJECT_NAME }}/bin/Release/*.nupkg
+          retention-days: 5
+        
+  release:
+    name: Release to GitHub & NuGet
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download Artifact
+        uses: actions/download-artifact@v1
+        with:
+          name: nupkg
+          
+      - name: List files
+        run: ls ./nupkg
+
+      - name: Push to GitHub Feed
+        run: echo "Deploy to GitHub" #dotnet nuget push ./nupkg/*.nupkg --api-key $GITHUB_TOKEN --skip-duplicate --source $GITHUB_FEED
+        
+      - name: Push to NuGet Feed
+        run: echo "deploy to NuGet" #dotnet nuget push ./nupkg/*.nupkg --api-key $NUGET_KEY --skip-duplicate --source $NUGET_FEED
+

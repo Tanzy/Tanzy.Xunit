@@ -1,0 +1,101 @@
+name: Pull Request Check
+
+on:
+  push:
+    branches:
+      - main
+      
+  pull_request:
+
+env:
+  # Stop wasting time caching packages
+  DOTNET_SKIP_FIRST_TIME_EXPERIENCE: true
+  # Disable sending usage data to Microsoft
+  DOTNET_CLI_TELEMETRY_OPTOUT: true
+  # Project name to pack and publish
+  PROJECT_NAME: Tanzy.Xunit
+  # GitHub Packages Feed settings
+  GITHUB_FEED: https://nuget.pkg.github.com/Tanzy/index.json
+  GITHUB_USER: Tanzy
+  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  
+
+jobs:
+
+  build:
+    name: Build and Test Project
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ ubuntu-latest ] #, windows-latest, macos-latest ]
+    steps:
+        
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0 # fetch-depth is needed for GitVersion
+      
+      #Install and calculate the new version with GitVersion
+      - name: Install GitVersion
+        uses: gittools/actions/gitversion/setup@v0.9.7
+        with:
+          versionSpec: '5.x'
+
+      - name: Determine Version
+        uses: gittools/actions/gitversion/execute@v0.9.7
+        id: gitversion # step id used as reference for output values
+
+      - name: Display GitVersion outputs
+        run: |
+          echo "MajorMinorPatch ${{ steps.gitversion.outputs.majorMinorPatch }}"
+          echo "NuGetVersionV2: ${{ steps.gitversion.outputs.nuGetVersionV2 }}"
+          echo "CommitsSinceVersionSource: ${{ steps.gitversion.outputs.CommitsSinceVersionSource }}"
+      
+      - name: Restore
+        run: dotnet restore  
+      # Build and test
+      - name: Build
+        run: dotnet build -c Release --no-restore -p:Version=${{ steps.gitversion.outputs.semVer }}
+      - name: Test
+        run: dotnet test --no-restore -c Release
+        
+      - name: Pack
+        if: matrix.os == 'ubuntu-latest'
+        run: dotnet pack -v normal -c Release --no-restore -p:PackageVersion=${{ steps.gitversion.outputs.nuGetVersionV2 }} src/$PROJECT_NAME/$PROJECT_NAME.*proj
+        
+      # Upload NuGet Package to Artifact store 
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: nupkg
+          path: ./src/${{ env.PROJECT_NAME }}/bin/Release/*.nupkg
+          retention-days: 5
+
+        
+# Label the Pull Request
+  label:
+
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+
+    steps:
+    - uses: actions/labeler@v2
+      with:
+        repo-token: ${{ secrets.GITHUB_TOKEN }}
+        
+  # prerelease:
+  #   needs: build
+  #   if: github.ref == 'refs/heads/main'
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - name: Download Artifact
+  #       uses: actions/download-artifact@v1
+  #       with:
+  #         name: nupkg
+  #     - name: Add GitHub Feed
+  #       run: dotnet nuget add source --username $GITHUB_USER --password $GITHUB_TOKEN --store-password-in-clear-text --name github "$GITHUB_FEED"
+      
+  #     - name: Push to GitHub Feed
+  #       run: echo "Deploy to GitHub" #dotnet nuget push ./nupkg/*.nupkg --api-key $GITHUB_TOKEN --skip-duplicate --source $GITHUB_FEED

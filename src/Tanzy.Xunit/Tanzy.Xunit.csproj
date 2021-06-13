@@ -1,0 +1,19 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>netstandard2.0</TargetFramework>
+        <Title>xUnit Extensions</Title>
+        <Description>xUnit extensions that can be useful</Description>
+        <Copyright>Copyright 2021</Copyright>
+        <PackageTags>xUnit Extensions</PackageTags>
+        <IsPackable>true</IsPackable>
+        <PackageIconUrl>MIT</PackageIconUrl>
+        <RepositoryUrl>https://github.com/Tanzy/Tanzy.Xunit</RepositoryUrl>
+        <IsTestProject>false</IsTestProject>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <PackageReference Include="xunit" Version="2.4.1" />
+    </ItemGroup>
+
+</Project>
