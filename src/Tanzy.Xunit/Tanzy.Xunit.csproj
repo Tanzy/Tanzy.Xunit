@@ -10,6 +10,7 @@
         <PackageIconUrl>MIT</PackageIconUrl>
         <RepositoryUrl>https://github.com/Tanzy/Tanzy.Xunit</RepositoryUrl>
         <IsTestProject>false</IsTestProject>
+        <LangVersion>default</LangVersion>
     </PropertyGroup>
 
     <ItemGroup>
