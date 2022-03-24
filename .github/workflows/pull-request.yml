@@ -85,11 +85,11 @@ jobs:
       - name: Build
         run: dotnet build -c Release --no-restore -p:Version=${{ steps.gitversion.outputs.semVer }}
 
-      - name: End Sonar scan
-        run: dotnet sonarscanner end /d:sonar.login=${{ secrets.SONAR_TOKEN }}
-
       - name: Test
         run: dotnet test --no-restore -c Release --collect "Code Coverage"
+
+      - name: End Sonar scan
+        run: dotnet sonarscanner end /d:sonar.login=${{ secrets.SONAR_TOKEN }}
       
       - name: Pack
         if: matrix.os == 'ubuntu-latest'
