@@ -9,42 +9,49 @@ namespace Tanzy.Xunit.Tests.DummyTests
         [Category("Sample")]
         public void CategorySampleTest()
         {
+            Assert.True(true);
         }
 
         [Fact]
         [Bug]
         public void BugNoNameTest()
         {
+            Assert.True(true);
         }
 
         [Fact]
         [Bug(88)]
         public void BugNumberTest()
         {
+            Assert.True(true);
         }
 
         [Fact]
         [Bug("Something")]
         public void BugNameTest()
         {
+            Assert.True(true);
         }
 
         [Fact]
         [UserStory()]
         public void UserStoryNoNameTest()
         {
+            Assert.True(true);
         }
 
         [Fact]
         [UserStory(33)]
         public void UserStoryNumberTest()
         {
+            Assert.True(true);
         }
 
         [Fact]
         [UserStory("A Story")]
         public void UserStoryNameTest()
         {
+            Assert.True(true);
         }
     }
 }
