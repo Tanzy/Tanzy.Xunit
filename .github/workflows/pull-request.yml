@@ -89,7 +89,7 @@ jobs:
         run: dotnet sonarscanner end /d:sonar.login=${{ secrets.SONAR_TOKEN }}
 
       - name: Test
-        run: dotnet test --no-restore -c Release
+        run: dotnet test --no-restore -c Release --collect "Code Coverage"
       
       - name: Pack
         if: matrix.os == 'ubuntu-latest'
