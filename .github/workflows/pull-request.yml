@@ -64,58 +64,6 @@ jobs:
           key: ${{ runner.os }}-sonar
           restore-keys: ${{ runner.os }}-sonar
           
-      - name: Cache SonarCloud scanner
-        id: cache-sonar-scanner
-        uses: actions/cache@v1
-        with:
-          path: .\.sonar\scanner
-          key: ${{ runner.os }}-sonar-scanner
-          restore-keys: ${{ runner.os }}-sonar-scanner
-          
-      - name: Install SonarCloud scanner
-        if: steps.cache-sonar-scanner.outputs.cache-hit != 'true'
-        shell: pwsh
-        run: |
-          New-Item -Path .\.sonar\scanner -ItemType Directory
-          dotnet tool update dotnet-sonarscanner --tool-path .\.sonar\scanner
-          
-      - name: Restore
-        run: dotnet restore  
-        
-      - name: Build and analyze
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Needed to get PR information, if any
-      
-      - name: Initiate SonarCloud
-        shell: pwsh
-        run: |
-          .\.sonar\scanner\dotnet-sonarscanner begin /k:"Tanzy_Tanzy.Xunit" /o:"tanzy" /d:sonar.login="${{ secrets.SONAR_TOKEN }}" /d:sonar.host.url="https://sonarcloud.io"
-
-        
-      # Build and test
-      - name: Build
-        run: dotnet build -c Release --no-restore -p:Version=${{ steps.gitversion.outputs.semVer }}
-      
-      - name: Finalize SonarCloud
-        shell: pwsh
-        run: |
-          .\.sonar\scanner\dotnet-sonarscanner end /d:sonar.login="${{ secrets.SONAR_TOKEN }}"
-          
-      - name: Test
-        run: dotnet test --no-restore -c Release
-      
-      - name: Pack
-        if: matrix.os == 'ubuntu-latest'
-        run: dotnet pack -v normal -c Release --no-restore -p:PackageVersion=${{ steps.gitversion.outputs.nuGetVersionV2 }} src/$PROJECT_NAME/$PROJECT_NAME.*proj
-        
-      # Upload NuGet Package to Artifact store 
-      - name: Upload Artifact
-        uses: actions/upload-artifact@v2
-        with:
-          name: nupkg
-          path: ./src/${{ env.PROJECT_NAME }}/bin/Release/*.nupkg
-          retention-days: 5
-
         
 # Label the Pull Request
   label:
