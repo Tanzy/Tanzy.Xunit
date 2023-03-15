@@ -1,10 +1,6 @@
 name: Pull Request Check
 
 on:
-  push:
-    branches:
-      - main
-      
   pull_request:
     types: [opened, synchronize, reopened]
 
@@ -56,7 +52,12 @@ jobs:
           echo "MajorMinorPatch ${{ steps.gitversion.outputs.majorMinorPatch }}"
           echo "NuGetVersionV2: ${{ steps.gitversion.outputs.nuGetVersionV2 }}"
           echo "CommitsSinceVersionSource: ${{ steps.gitversion.outputs.CommitsSinceVersionSource }}"
-      
+
+      - name: Setup .NET Core
+        uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: '3.x'
+
       - name: Cache SonarCloud packages
         uses: actions/cache@v1
         with:
