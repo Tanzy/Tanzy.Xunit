@@ -10,10 +10,15 @@
         <PackageIconUrl>MIT</PackageIconUrl>
         <RepositoryUrl>https://github.com/Tanzy/Tanzy.Xunit</RepositoryUrl>
         <IsTestProject>false</IsTestProject>
+        <PackageReadmeFile>README.md</PackageReadmeFile>
     </PropertyGroup>
 
     <ItemGroup>
-      <PackageReference Include="xunit" Version="2.4.1" />
+        <PackageReference Include="xunit" Version="2.4.1" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <None Include="..\..\README.md" Pack="true" PackagePath="\" />
     </ItemGroup>
 
 </Project>
