@@ -4,13 +4,16 @@
         <TargetFramework>netstandard2.0</TargetFramework>
         <Title>xUnit Extensions</Title>
         <Description>xUnit extensions that can be useful</Description>
-        <Copyright>Copyright 2021</Copyright>
         <PackageTags>xUnit Extensions</PackageTags>
         <IsPackable>true</IsPackable>
         <PackageIconUrl>MIT</PackageIconUrl>
         <RepositoryUrl>https://github.com/Tanzy/Tanzy.Xunit</RepositoryUrl>
         <IsTestProject>false</IsTestProject>
         <PackageReadmeFile>README.md</PackageReadmeFile>
+        <PackageLicenseExpression>MIT</PackageLicenseExpression>
+        <LangVersion>latestmajor</LangVersion>
+        <Authors>Tanzy</Authors>
+        <Copyright>Copyright 2021-2023</Copyright>
     </PropertyGroup>
 
     <ItemGroup>
