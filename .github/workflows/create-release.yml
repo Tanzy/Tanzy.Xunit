@@ -25,18 +25,18 @@ jobs:
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/main'
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
         with:
           fetch-depth: 0 # fetch-depth is needed for GitVersion
       
       #Install and calculate the new version with GitVersion
       - name: Install GitVersion
-        uses: gittools/actions/gitversion/setup@v0.9.11
+        uses: gittools/actions/gitversion/setup@v0.10.2
         with:
           versionSpec: '5.x'
 
       - name: Determine Version
-        uses: gittools/actions/gitversion/execute@v0.9.11
+        uses: gittools/actions/gitversion/execute@v0.10.2
         id: gitversion # step id used as reference for output values
 
       - name: Display GitVersion outputs
@@ -48,7 +48,7 @@ jobs:
       # Drafts your next Release notes as Pull Requests are merged into "master"
       # https://github.com/marketplace/actions/release-drafter
       - name: Draft Release
-        uses: release-drafter/release-drafter@v5.15.0
+        uses: release-drafter/release-drafter@v5.21.1
         with:
           # (Optional) specify config name to use, relative to .github/. Default: release-drafter.yml
           config-name: release-drafter.yml
