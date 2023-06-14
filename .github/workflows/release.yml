@@ -38,7 +38,7 @@ jobs:
         run: echo "$GITHUB_CONTEXT"
         
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
           fetch-depth: 0 # fetch-depth is needed for GitVersion
           # The branch, tag or SHA to checkout. When checking out the repository that
@@ -47,12 +47,12 @@ jobs:
           ref: '${{ github.event.release.tag_name }}'
       #Install and calculate the new version with GitVersion
       - name: Install GitVersion
-        uses: gittools/actions/gitversion/setup@v0.9.11
+        uses: gittools/actions/gitversion/setup@v0.10.2
         with:
           versionSpec: '5.x'
 
       - name: Determine Version
-        uses: gittools/actions/gitversion/execute@v0.9.11
+        uses: gittools/actions/gitversion/execute@v0.10.2
         id: gitversion # step id used as reference for output values
 
       - name: Display GitVersion outputs
@@ -65,7 +65,7 @@ jobs:
         run: echo "tag_name ${{ github.event.release.tag_name }}"
 
       - name: Setup .NET Core
-        uses: actions/setup-dotnet@v1
+        uses: actions/setup-dotnet@v3
         with:
           dotnet-version: '6.x'
           
@@ -82,7 +82,7 @@ jobs:
         run: dotnet pack -v normal -c Release --no-restore -p:PackageVersion=${{ steps.gitversion.outputs.nuGetVersionV2 }} src/$PROJECT_NAME/$PROJECT_NAME.*proj
       # Upload NuGet Package to Artifact store 
       - name: Upload Artifact
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: nupkg
           path: ./src/${{ env.PROJECT_NAME }}/bin/Release/*.nupkg
@@ -94,7 +94,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Download Artifact
-        uses: actions/download-artifact@v1
+        uses: actions/download-artifact@v3
         with:
           name: nupkg
           

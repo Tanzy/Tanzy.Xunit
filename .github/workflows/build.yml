@@ -1,54 +1,123 @@
-name: Build # Action Name
+name: SonarCloud # Action Name
 on:
-  pull_request:
-    types: [opened, synchronize, reopened]
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+env:
+  # Stop wasting time caching packages
+  DOTNET_SKIP_FIRST_TIME_EXPERIENCE: true
+  # Disable sending usage data to Microsoft
+  DOTNET_CLI_TELEMETRY_OPTOUT: true
+  # Project name to pack and publish
+  PROJECT_NAME: Tanzy.Xunit
+  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }} 
+
 jobs:
   build:
     name: Build
-    runs-on: windows-latest
+    runs-on: ubuntu-latest
     steps:
       - name: Set up JDK 11
-        uses: actions/setup-java@v1
+        uses: actions/setup-java@v3
         with:
-          java-version: 1.11
+          java-version: 11
+          distribution: 'zulu' # Alternative distribution options are available.
 
-      - uses: actions/checkout@v2
+      - name: Checkout
+        uses: actions/checkout@v3
         with:
           fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis
-
-      - name: Cache SonarCloud packages
-        uses: actions/cache@v1
-        with:
-          path: ~\sonar\cache
-          key: ${{ runner.os }}-sonar
-          restore-keys: ${{ runner.os }}-sonar
 
       - name: Setup .NET Core
         uses: actions/setup-dotnet@v1
         with:
           dotnet-version: '6.x'
 
+      #Install and calculate the new version with GitVersion
+      - name: Install GitVersion
+        uses: gittools/actions/gitversion/setup@v0.10.2
+        with:
+          versionSpec: '5.x'
+
+      - name: Determine Version
+        uses: gittools/actions/gitversion/execute@v0.10.2
+        id: gitversion # step id used as reference for output values
+
+      - name: Display GitVersion outputs
+        run: |
+          echo "MajorMinorPatch ${{ steps.gitversion.outputs.majorMinorPatch }}"
+          echo "NuGetVersionV2: ${{ steps.gitversion.outputs.nuGetVersionV2 }}"
+          echo "CommitsSinceVersionSource: ${{ steps.gitversion.outputs.CommitsSinceVersionSource }}"
+
+      - name: Cache SonarCloud packages
+        uses: actions/cache@v3
+        with:
+          path: ~\sonar\cache
+          key: ${{ runner.os }}-sonar
+          restore-keys: ${{ runner.os }}-sonar
+      
       - name: Cache SonarCloud scanner
         id: cache-sonar-scanner
-        uses: actions/cache@v1
+        uses: actions/cache@v3
         with:
           path: .\.sonar\scanner
           key: ${{ runner.os }}-sonar-scanner
           restore-keys: ${{ runner.os }}-sonar-scanner
 
+      - name: Add dotnet tools directory to Path
+        if: ${{ env.ACT }}
+        run: |
+              echo "::set-env name=PATH::${PATH}:${HOME}/.dotnet/tools"
+
       - name: Install SonarCloud scanner
         if: steps.cache-sonar-scanner.outputs.cache-hit != 'true'
-        shell: powershell
-        run: |
-          New-Item -Path .\.sonar\scanner -ItemType Directory
-          dotnet tool update dotnet-sonarscanner --tool-path .\.sonar\scanner
+        run: dotnet tool install --global dotnet-sonarscanner
+        
+      - name: Install Code Coverage
+        run: dotnet tool install --global dotnet-coverage
+      
+      - name: Restore
+        run: dotnet restore
 
-      - name: Build and analyze
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Needed to get PR information, if any
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-        shell: powershell
+      - name: Extract branch name
+        shell: bash
+        run: echo "branch=${GITHUB_HEAD_REF:-${GITHUB_REF#refs/heads/}}" >> $GITHUB_OUTPUT
+        id: extract_branch
+
+      - name: Begin Sonar scan
         run: |
-          .\.sonar\scanner\dotnet-sonarscanner begin /k:"Tanzy_Tanzy.Xunit" /o:"tanzy" /d:sonar.login="${{ secrets.SONAR_TOKEN }}" /d:sonar.host.url="https://sonarcloud.io"
-          dotnet build
-          .\.sonar\scanner\dotnet-sonarscanner end /d:sonar.login="${{ secrets.SONAR_TOKEN }}"
+          dotnet sonarscanner begin /k:"Tanzy_Tanzy.Xunit" /o:"tanzy" /d:sonar.login="${{ secrets.SONAR_TOKEN }}" \
+            /d:sonar.host.url="https://sonarcloud.io" /v:${{ steps.gitversion.outputs.semVer }} \
+            /d:sonar.cs.vstest.reportsPaths=TestResults/*.trx \
+            /d:sonar.cs.opencover.reportsPaths=TestResults/*/coverage.opencover.xml \
+            /d:sonar.coverage.exclusions="**Test*.cs" \
+            /d:sonar.branch.name="${{ steps.extract_branch.outputs.branch }}" 
+
+        # Build and test
+      - name: Build
+        run: dotnet build --no-incremental --configuration release
+
+      - name: Test
+        run: |
+          dotnet test Tests/**/*.csproj \
+            --no-restore \
+            --no-build \
+            -c Release \
+            --collect "XPlat Code Coverage" \
+            --results-directory TestResults/
+        #run: dotnet-coverage collect 'dotnet test' -f xml  -o 'coverage.xml'
+
+
+        #run: | 
+        #  dotnet test Tests/**/*.csproj \
+        #      --no-restore \
+        #      --no-build \
+        #      -c release \
+        #      --collect "XPlat Code Coverage" \
+        #      --results-directory TestResults
+
+      - name: End Sonar scan
+        run: dotnet sonarscanner end /d:sonar.login=${{ secrets.SONAR_TOKEN }}
