@@ -97,6 +97,7 @@ jobs:
         uses: actions/download-artifact@v3
         with:
           name: nupkg
+          path: ./nupkg
           
       - name: List files
         run: ls ./nupkg
