@@ -53,5 +53,6 @@ namespace Tanzy.Xunit.Tests.DummyTests
         {
             Assert.True(true);
         }
+
     }
 }

@@ -15,7 +15,7 @@ It would be easier to just do ```[Bug]```
 
 This project enables the following categories, please fee free to add a Pull Request with more
 
-```
+```csharp
 [Fact]
 [Category("Sample")]
 public void CategorySampleTest()
@@ -58,6 +58,29 @@ public void UserStoryNameTest()
 {
 }
 ```
+
+### Class Level Categories
+Some people also like to mark if there tests are Unit, Integration or System tests. So the following attributes have
+been added to enable a class to be marked as containing appropriate type of tests.
+
+```csharp
+
+[UnitTests]
+public class ThisContainsUnitTests
+{
+}
+
+[IntegrationTests]
+public class ThisContainsIntegrationTests
+{
+}
+
+[SystemTests]
+public class ThisContainsSystemTests
+{
+}
+```
+
 
 ## Contributing
 Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.
