@@ -3,7 +3,7 @@ using Xunit;
 
 namespace Tanzy.Xunit.Tests.DummyTests;
 
-[SystemTest]
+[SystemTests]
 public class SystemTestSample
 {
     [Fact]
