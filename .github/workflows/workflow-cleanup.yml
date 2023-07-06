@@ -11,8 +11,8 @@ on:
         default: "5"
         required: false
 
-  schedule:
-    - cron: '0 2 * * *'
+  #schedule:
+  #  - cron: '0 2 * * *'
 
 env:
   retain_days: "7"
