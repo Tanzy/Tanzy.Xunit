@@ -57,6 +57,24 @@ public void UserStoryNumberTest()
 public void UserStoryNameTest()
 {
 }
+
+[Fact]
+[Task()]
+public void UserStoryNoNameTest()
+{
+}
+
+[Fact]
+[Task(33)]
+public void UserStoryNumberTest()
+{
+}
+
+[Fact]
+[Task("A Story")]
+public void UserStoryNameTest()
+{
+}
 ```
 
 ### Class Level Categories

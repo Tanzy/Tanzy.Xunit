@@ -54,5 +54,26 @@ namespace Tanzy.Xunit.Tests.DummyTests
             Assert.True(true);
         }
 
+        [Fact]
+        [Task()]
+        public void TaskNoNameTest()
+        {
+            Assert.True(true);
+        }
+
+        [Fact]
+        [Task(33)]
+        public void TaskNumberTest()
+        {
+            Assert.True(true);
+        }
+
+        [Fact]
+        [Task("A Story")]
+        public void TaskNameTest()
+        {
+            Assert.True(true);
+        }
+
     }
 }
