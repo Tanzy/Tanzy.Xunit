@@ -1,0 +1,9 @@
+<Project>
+    <PropertyGroup>
+        <CentralPackageTransitivePinningEnabled>true</CentralPackageTransitivePinningEnabled>
+        <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
+    </PropertyGroup>
+    <ItemGroup>
+        <PackageVersion Include="Newtonsoft.Json" VersionOverride="13.0.3" />
+    </ItemGroup>
+</Project>
