@@ -22,7 +22,7 @@ jobs:
         uses: actions/setup-dotnet@v4.0.0
         
       - name: Restore dependencies
-        run: dotnet restore
+        run: dotnet restore Tanzy.Xunit.sln
         
       - name: Run Snyk to check for vulnerabilities
         uses: snyk/actions/dotnet@master
@@ -30,7 +30,7 @@ jobs:
         env:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
         with:
-          args: --sarif-file-output=${{ GITHUB_WORKSPACE }}/scan/snyk.sarif
+          args: --sarif-file-output=snyk.sarif
 
       - name: Echo values from ENV
         run: |
@@ -39,4 +39,4 @@ jobs:
       - name: Upload result to GitHub Code Scanning
         uses: github/codeql-action/upload-sarif@v3
         with:
-          sarif_file: ${{ GITHUB_WORKSPACE }}/scan/snyk.sarif
+          sarif_file: snyk.sarif
