@@ -34,7 +34,7 @@ jobs:
 
       - name: Echo values from ENV
         run: |
-            ls ${{ GITHUB_WORKSPACE }}/scan
+            ls
           
       - name: Upload result to GitHub Code Scanning
         uses: github/codeql-action/upload-sarif@v3
