@@ -30,13 +30,9 @@ jobs:
         env:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
         with:
-          args: --sarif-file-output=snyk.sarif --sarif --file=Tanzy.Xunit.sln
-
-      - name: Echo values from ENV
-        run: |
-            ls
+          args: --sarif-file-output=snyk.sarif --file=Tanzy.Xunit.sln
           
       - name: Upload result to GitHub Code Scanning
         uses: github/codeql-action/upload-sarif@v3
         with:
-          sarif_file: ./scan/snyk.sarif
+          sarif_file: snyk.sarif
