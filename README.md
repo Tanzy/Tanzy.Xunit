@@ -4,14 +4,34 @@ This project contains a collection of helpers for xUnit.
 ## Installation
 Release packages can be installed from NuGet:
 
-- Use `Tanzy.Xunit` with xUnit v2.
-- Use `Tanzy.Xunit.v3` with xUnit v3.
+- Use `Tanzy.Xunit` with xUnit v2:
 
-Both packages expose the same attributes in the `Tanzy.Xunit.Categories` namespace.
+  ```shell
+  dotnet add package Tanzy.Xunit
+  ```
+
+- Use `Tanzy.Xunit.v3` with xUnit v3:
+
+  ```shell
+  dotnet add package Tanzy.Xunit.v3
+  ```
+
+The v2 attributes are in the `Tanzy.Xunit.Categories` namespace. The v3
+attributes are in the `Tanzy.Xunit.v3.Categories` namespace.
 
 
 ## Usage
 Below is how you use this package
+
+Import the namespace for the package you installed:
+
+```csharp
+// Tanzy.Xunit (xUnit v2)
+using Tanzy.Xunit.Categories;
+
+// Tanzy.Xunit.v3 (xUnit v3)
+using Tanzy.Xunit.v3.Categories;
+```
 
 ### Categories
 One issue with xUnit traits is that you normally have to write `[Trait("Category", "Bug")]`.
