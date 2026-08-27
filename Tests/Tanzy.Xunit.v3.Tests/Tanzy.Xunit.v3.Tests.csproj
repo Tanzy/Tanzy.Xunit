@@ -1,0 +1,21 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <IsPackable>false</IsPackable>
+        <IsTestProject>true</IsTestProject>
+        <OutputType>Exe</OutputType>
+        <LangVersion>latestmajor</LangVersion>
+        <TargetFramework>net8.0</TargetFramework>
+        <TestingPlatformDotnetTestSupport>true</TestingPlatformDotnetTestSupport>
+        <UseMicrosoftTestingPlatformRunner>true</UseMicrosoftTestingPlatformRunner>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="xunit.v3" Version="4.0.0" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\..\src\Tanzy.Xunit.v3\Tanzy.Xunit.v3.csproj" />
+    </ItemGroup>
+
+</Project>
