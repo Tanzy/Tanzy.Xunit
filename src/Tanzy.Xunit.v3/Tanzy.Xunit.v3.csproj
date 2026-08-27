@@ -2,11 +2,10 @@
 
     <PropertyGroup>
         <TargetFramework>netstandard2.0</TargetFramework>
-        <Title>xUnit Extensions</Title>
-        <Description>xUnit extensions that can be useful</Description>
-        <PackageTags>xUnit Extensions</PackageTags>
+        <Title>Tanzy.Xunit extensions for xUnit v3</Title>
+        <Description>xUnit v3 extensions that can be useful</Description>
+        <PackageTags>xUnit xUnit.v3 Extensions</PackageTags>
         <IsPackable>true</IsPackable>
-        <PackageIconUrl>MIT</PackageIconUrl>
         <RepositoryUrl>https://github.com/Tanzy/Tanzy.Xunit</RepositoryUrl>
         <IsTestProject>false</IsTestProject>
         <PackageReadmeFile>README.md</PackageReadmeFile>
@@ -18,11 +17,11 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="xunit" Version="2.9.3" />
+        <PackageReference Include="xunit.v3.extensibility.core" Version="4.0.0" />
     </ItemGroup>
 
     <ItemGroup>
-      <None Include="..\..\README.md" Pack="true" PackagePath="\" />
+        <None Include="..\..\README.md" Pack="true" PackagePath="\" />
     </ItemGroup>
 
 </Project>

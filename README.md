@@ -1,19 +1,24 @@
-# Xunit
-This project contains a collection of helpers for XUnit. Some bits have been inspired by other repositories, or bits of code from Stackoverflow
+# Tanzy.Xunit
+This project contains a collection of helpers for xUnit.
 
 ## Installation
-Release packages can be installed from NuGet.
+Release packages can be installed from NuGet:
+
+- Use `Tanzy.Xunit` with xUnit v2.
+- Use `Tanzy.Xunit.v3` with xUnit v3.
+
+Both packages expose the same attributes in the `Tanzy.Xunit.Categories` namespace.
 
 
 ## Usage
 Below is how you use this package
 
 ### Categories
-One issue with xUnit is the Traits can be a pain in the backside, it issue being that you have to do ```[Trait("Category", "Bug")]```
+One issue with xUnit traits is that you normally have to write `[Trait("Category", "Bug")]`.
 
-It would be easier to just do ```[Bug]```
+It is easier to write `[Bug]`.
 
-This project enables the following categories, please fee free to add a Pull Request with more
+This project enables the following categories:
 
 ```csharp
 [Fact]
@@ -78,7 +83,7 @@ public void UserStoryNameTest()
 ```
 
 ### Class Level Categories
-Some people also like to mark if there tests are Unit, Integration or System tests. So the following attributes have
+Some people also like to mark whether their tests are unit, integration, or system tests. The following attributes have
 been added to enable a class to be marked as containing appropriate type of tests.
 
 ```csharp
